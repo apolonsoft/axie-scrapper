@@ -1,5 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { StatsSchema } from './stats.schema';
+import { StatsInterface } from '../interfaces/stat-interface';
+import { PartSchema } from './part.schema';
+import { PartInterface } from '../interfaces/part-interface';
 
 export type AxieDocument = Axie & Document;
 
@@ -12,16 +16,25 @@ export class Axie {
   id: string;
 
   @Prop()
-  name: string;
-
-  @Prop()
   image: string;
 
   @Prop()
   class: string;
 
   @Prop()
-  breedCount: number;
+  genes: string;
+
+  @Prop({ type: StatsSchema })
+  stats: StatsInterface;
+
+  @Prop({ type: [PartSchema], default: [] })
+  parts: PartInterface[];
+
+  @Prop()
+  genQuantity: number;
+
+  @Prop({ type: Object })
+  allGenes: Record<string, unknown>;
 
   @Prop()
   createdAt: Date;
