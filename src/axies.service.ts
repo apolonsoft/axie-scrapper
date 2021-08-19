@@ -9,10 +9,16 @@ import { Model } from 'mongoose';
 import { AxieGene } from 'agp-npm/dist/axie-gene';
 import { Axie, AxieDocument } from './schemas/axie.schema';
 import { GetLatestAxiesQueryDto } from './dtos/get-latest-axies-query.dto';
+import {
+  LatestAxies,
+  LatestAxiesDocument,
+} from './schemas/latest-axies.schema';
 
 @Injectable()
 export class AxiesService implements OnApplicationBootstrap {
   constructor(
+    @InjectModel(LatestAxies.name)
+    private latestAxiesModel: Model<LatestAxiesDocument>,
     @InjectModel(RecentlyAxiesSold.name)
     private recentlyAxiesSoldModel: Model<RecentlyAxiesSoldDocument>,
     @InjectModel(Axie.name)
@@ -23,6 +29,13 @@ export class AxiesService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     // await this.getRecentlyAxiesSold(0, 100);
     // await this.getAxieDetail('58279');
+    await this.getAxieLatest({
+      from: 0,
+      size: 10,
+      sort: 'PriceAsc',
+      auctionType: 'Sale',
+      criteria: {},
+    });
   }
 
   private async getAxieLatest(input: GetLatestAxiesQueryDto) {
@@ -114,7 +127,42 @@ export class AxiesService implements OnApplicationBootstrap {
         .toPromise();
       const { data } = result.data;
       const list = data.axies.results;
-    } catch (error) {}
+      for (const axie of list) {
+        const {
+          id,
+          image,
+          class: cls,
+          name,
+          genes,
+          owner,
+          stage,
+          title,
+          breedCount,
+          level,
+          parts,
+          stats,
+          auction,
+        } = axie;
+        const createdAxie = new this.latestAxiesModel({
+          id,
+          image,
+          class: cls,
+          name,
+          genes,
+          owner,
+          stage,
+          title,
+          breedCount,
+          level,
+          parts,
+          stats,
+          auction,
+        });
+        await createdAxie.save();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   private async getAxieDetail(axieId: string) {
