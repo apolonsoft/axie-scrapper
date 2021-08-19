@@ -8,6 +8,7 @@ import {
 import { Model } from 'mongoose';
 import { AxieGene } from 'agp-npm/dist/axie-gene';
 import { Axie, AxieDocument } from './schemas/axie.schema';
+import { GetLatestAxiesQueryDto } from './dtos/get-latest-axies-query.dto';
 
 @Injectable()
 export class AxiesService implements OnApplicationBootstrap {
@@ -21,7 +22,99 @@ export class AxiesService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     //await this.getRecentlyAxiesSold(0, 100);
-    await this.getAxieDetail('1621247');
+    await this.getAxieDetail('58279');
+  }
+
+  private async getAxieLatest(input: GetLatestAxiesQueryDto) {
+    try {
+      const { from, size, sort, auctionType, criteria } = input;
+      const query = `query GetAxieLatest($auctionType: AuctionType, $criteria: AxieSearchCriteria, $from: Int, $sort: SortBy, $size: Int, $owner: String) {
+  axies(auctionType: $auctionType, criteria: $criteria, from: $from, sort: $sort, size: $size, owner: $owner) {
+    total
+    results {
+      id
+      image
+      class
+      name
+      genes
+      owner
+      class
+      stage
+      title
+      breedCount
+      level
+      parts {
+        id
+        name
+        class
+        type
+        specialGenes
+        stage
+        abilities {
+          id
+          name
+          attack
+          defense
+          energy
+          description
+          backgroundUrl
+          effectIconUrl
+          __typename
+        }
+        __typename
+      }
+      stats {
+        hp
+        speed
+        skill
+        morale
+        __typename
+      }
+      auction {
+        startingPrice
+        endingPrice
+        startingTimestamp
+        endingTimestamp
+        duration
+        timeLeft
+        currentPrice
+        currentPriceUSD
+        suggestedPrice
+        seller
+        listingIndex
+        state
+        __typename
+      }
+      __typename
+      __typename
+    }
+    __typename
+  }
+}
+`;
+      const result = await this.httpService
+        .post(
+          'https://axieinfinity.com/graphql-server-v2/graphql',
+          JSON.stringify({
+            query,
+            variables: {
+              from,
+              size,
+              sort,
+              auctionType,
+              criteria,
+            },
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        .toPromise();
+      const { data } = result.data;
+      const list = data.axies.results;
+    } catch (error) {}
   }
 
   private async getAxieDetail(axieId: string) {
@@ -29,94 +122,94 @@ export class AxiesService implements OnApplicationBootstrap {
       const query = `query GetAxieDetail($axieId: ID!) {
   axie(axieId: $axieId) {
     id
-  image
-  class
-  chain
-  name
-  genes
-  owner
-  birthDate
-  bodyShape
-  sireId
-  sireClass
-  matronId
-  matronClass
-  stage
-  title
-  breedCount
-  level
-  figure {
-    atlas
-    model
     image
-    __typename
-  }
-
- stats {
-    hp
-  speed
-  skill
-  morale
-    __typename
-  }
-  auction {
-    startingPrice
-  endingPrice
-  startingTimestamp
-  endingTimestamp
-  duration
-  timeLeft
-  currentPrice
-  currentPriceUSD
-  suggestedPrice
-  seller
-  listingIndex
-  state
-    __typename
-  }
-  ownerProfile {
-    name
-    __typename
-  }
-  battleInfo {
-    banned
-  banUntil
-  level
-    __typename
-  }
-  children {
-    id
-    name
     class
-    image
-    title
+    chain
+    name
+    genes
+    owner
+    birthDate
+    bodyShape
+    sireId
+    sireClass
+    matronId
+    matronClass
     stage
+    title
+    breedCount
+    level
+    figure {
+      atlas
+      model
+      image
+      __typename
+    }
+    stats {
+      hp
+      speed
+      skill
+      morale
+      __typename
+    }
+    auction {
+      startingPrice
+      endingPrice
+      startingTimestamp
+      endingTimestamp
+      duration
+      timeLeft
+      currentPrice
+      currentPriceUSD
+      suggestedPrice
+      seller
+      listingIndex
+      state
+      __typename
+    }
+    ownerProfile {
+      name
+      __typename
+    }
+    battleInfo {
+      banned
+      banUntil
+      level
+      __typename
+    }
+    children {
+      id
+      name
+      class
+      image
+      title
+      stage
+      __typename
+    }
+    parts {
+      id
+      name
+      class
+      type
+      specialGenes
+      stage
+      abilities {
+        id
+        name
+        attack
+        defense
+        energy
+        description
+        backgroundUrl
+        effectIconUrl
+        __typename
+      }
+      __typename
+      __typename
+    }
     __typename
   }
-   parts {
-     id
-  name
-  class
-  type
-  specialGenes
-  stage
-  abilities {
-    id
-  name
-  attack
-  defense
-  energy
-  description
-  backgroundUrl
-  effectIconUrl
-  __typename
-  }
-  __typename
-    __typename
-  }
-    __typename
-  }
-}`;
+}
+`;
 
       const result = await this.httpService
         .post(
@@ -154,31 +247,32 @@ export class AxiesService implements OnApplicationBootstrap {
   private async getRecentlyAxiesSold(from: number, size: number) {
     try {
       const query = `query GetRecentlyAxiesSold($from: Int, $size: Int) {
-      settledAuctions {
-        axies(from: $from, size: $size) {
-        total
-        results {
-          id
-  name
-  image
-  class
-  breedCount
-   transferHistory {
- total
- results{
-  timestamp
-  withPrice
-  withPriceUsd
- }
+  settledAuctions {
+    axies(from: $from, size: $size) {
+      total
+      results {
+        id
+        name
+        image
+        class
+        breedCount
+        transferHistory {
+          total
+          results {
+            timestamp
+            withPrice
+            withPriceUsd
+          }
           __typename
         }
-  __typename
+        __typename
       }
       __typename
     }
     __typename
   }
-}`;
+}
+      `;
 
       const result = await this.httpService
         .post(
