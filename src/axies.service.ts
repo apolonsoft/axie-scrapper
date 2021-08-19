@@ -21,8 +21,8 @@ export class AxiesService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
-    //await this.getRecentlyAxiesSold(0, 100);
-    await this.getAxieDetail('58279');
+    // await this.getRecentlyAxiesSold(0, 100);
+    // await this.getAxieDetail('58279');
   }
 
   private async getAxieLatest(input: GetLatestAxiesQueryDto) {
