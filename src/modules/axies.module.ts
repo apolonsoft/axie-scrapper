@@ -12,6 +12,7 @@ import { Ability, AbilitySchema } from '../schemas/ability.schema';
 import { Part, PartSchema } from '../schemas/part.schema';
 import { LatestAxies, LatestAxiesSchema } from '../schemas/latest-axies.schema';
 import { CronService } from '../services/cron.service';
+import { AxiesController } from '../controllers/axies.controller';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CronService } from '../services/cron.service';
       { name: Ability.name, schema: AbilitySchema },
     ]),
   ],
+  controllers: [AxiesController],
   providers: [AxiesService, CronService],
 })
 export class AxiesModule {}

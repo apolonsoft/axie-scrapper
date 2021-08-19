@@ -26,10 +26,8 @@ export class AxiesService {
     private httpService: HttpService,
   ) {}
 
-  async onApplicationBootstrap() {
-    // await this.getRecentlyAxiesSold(0, 100);
-    // await this.getAxieDetail('58279');
-
+  async listLatest() {
+    return await this.latestAxiesModel.find().exec();
   }
 
   async getAxieLatest(input: GetLatestAxiesQueryDto) {
