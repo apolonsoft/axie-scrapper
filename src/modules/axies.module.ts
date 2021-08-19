@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AxiesService } from './axies.service';
+import { AxiesService } from '../services/axies.service';
 import {
   RecentlyAxiesSold,
   RecentlyAxiesSoldSchema,
-} from './schemas/recently-axies-sold.schema';
+} from '../schemas/recently-axies-sold.schema';
 import { HttpModule } from '@nestjs/axios';
-import { Axie, AxieSchema } from './schemas/axie.schema';
-import { Stats, StatsSchema } from './schemas/stats.schema';
-import { Ability, AbilitySchema } from './schemas/ability.schema';
-import { Part, PartSchema } from './schemas/part.schema';
-import { LatestAxies, LatestAxiesSchema } from './schemas/latest-axies.schema';
+import { Axie, AxieSchema } from '../schemas/axie.schema';
+import { Stats, StatsSchema } from '../schemas/stats.schema';
+import { Ability, AbilitySchema } from '../schemas/ability.schema';
+import { Part, PartSchema } from '../schemas/part.schema';
+import { LatestAxies, LatestAxiesSchema } from '../schemas/latest-axies.schema';
+import { CronService } from '../services/cron.service';
 
 @Module({
   imports: [
@@ -29,6 +30,6 @@ import { LatestAxies, LatestAxiesSchema } from './schemas/latest-axies.schema';
       { name: Ability.name, schema: AbilitySchema },
     ]),
   ],
-  providers: [AxiesService],
+  providers: [AxiesService, CronService],
 })
 export class AxiesModule {}

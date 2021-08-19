@@ -4,18 +4,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   RecentlyAxiesSold,
   RecentlyAxiesSoldDocument,
-} from './schemas/recently-axies-sold.schema';
+} from '../schemas/recently-axies-sold.schema';
 import { Model } from 'mongoose';
 import { AxieGene } from 'agp-npm/dist/axie-gene';
-import { Axie, AxieDocument } from './schemas/axie.schema';
-import { GetLatestAxiesQueryDto } from './dtos/get-latest-axies-query.dto';
+import { Axie, AxieDocument } from '../schemas/axie.schema';
+import { GetLatestAxiesQueryDto } from '../dtos/get-latest-axies-query.dto';
 import {
   LatestAxies,
   LatestAxiesDocument,
-} from './schemas/latest-axies.schema';
+} from '../schemas/latest-axies.schema';
 
 @Injectable()
-export class AxiesService implements OnApplicationBootstrap {
+export class AxiesService {
   constructor(
     @InjectModel(LatestAxies.name)
     private latestAxiesModel: Model<LatestAxiesDocument>,
@@ -29,16 +29,10 @@ export class AxiesService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     // await this.getRecentlyAxiesSold(0, 100);
     // await this.getAxieDetail('58279');
-    await this.getAxieLatest({
-      from: 0,
-      size: 10,
-      sort: 'PriceAsc',
-      auctionType: 'Sale',
-      criteria: {},
-    });
+
   }
 
-  private async getAxieLatest(input: GetLatestAxiesQueryDto) {
+  async getAxieLatest(input: GetLatestAxiesQueryDto) {
     try {
       const { from, size, sort, auctionType, criteria } = input;
       const query = `query GetAxieLatest($auctionType: AuctionType, $criteria: AxieSearchCriteria, $from: Int, $sort: SortBy, $size: Int, $owner: String) {
@@ -165,7 +159,7 @@ export class AxiesService implements OnApplicationBootstrap {
     }
   }
 
-  private async getAxieDetail(axieId: string) {
+  async getAxieDetail(axieId: string) {
     try {
       const query = `query GetAxieDetail($axieId: ID!) {
   axie(axieId: $axieId) {
@@ -292,7 +286,7 @@ export class AxiesService implements OnApplicationBootstrap {
     }
   }
 
-  private async getRecentlyAxiesSold(from: number, size: number) {
+  async getRecentlyAxiesSold(from: number, size: number) {
     try {
       const query = `query GetRecentlyAxiesSold($from: Int, $size: Int) {
   settledAuctions {
