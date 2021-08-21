@@ -30,6 +30,14 @@ export class AxiesService {
     return await this.latestAxiesModel.find().exec();
   }
 
+  async listAxies() {
+    return await this.axieModel.find().exec();
+  }
+
+  async listRecentlySold() {
+    return await this.recentlyAxiesSoldModel.find().exec();
+  }
+
   async getAxieLatest(input: GetLatestAxiesQueryDto) {
     try {
       const { from, size, sort, auctionType, criteria } = input;

@@ -5,8 +5,18 @@ import { AxiesService } from '../services/axies.service';
 export class AxiesController {
   constructor(private readonly axiesService: AxiesService) {}
 
-  @Get('/')
-  async findAll() {
+  @Get('/list-latest')
+  async listLatest() {
     await this.axiesService.listLatest();
+  }
+
+  @Get('/list-recently-sold')
+  async listRecentlySold() {
+    await this.axiesService.listRecentlySold();
+  }
+
+  @Get('/list-axies')
+  async listAxies() {
+    await this.axiesService.listAxies();
   }
 }

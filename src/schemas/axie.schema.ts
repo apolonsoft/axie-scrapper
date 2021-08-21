@@ -19,6 +19,9 @@ export class Axie {
   image: string;
 
   @Prop()
+  breedCount: number;
+
+  @Prop()
   class: string;
 
   @Prop()
