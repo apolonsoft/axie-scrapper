@@ -8,7 +8,7 @@ import { ScheduleModule } from '@nestjs/schedule';
   imports: [
     ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.PORT),
+    MongooseModule.forRoot(process.env.MONGO_URL),
     AxiesModule,
   ],
 })
