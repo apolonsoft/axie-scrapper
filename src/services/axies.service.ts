@@ -127,6 +127,7 @@ export class AxiesService {
         .toPromise();
       const { data } = result.data;
       const list = data.axies.results;
+      await this.latestAxiesModel.deleteMany({});
       for (const axie of list) {
         const {
           id,
@@ -340,7 +341,7 @@ export class AxiesService {
       const { data } = result.data;
 
       const axies = data.settledAuctions.axies.results;
-
+      await this.recentlyAxiesSoldModel.deleteMany({});
       for (const axie of axies) {
         const {
           id,
