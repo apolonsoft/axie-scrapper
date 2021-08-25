@@ -7,16 +7,16 @@ export class AxiesController {
 
   @Get('/list-latest')
   async listLatest() {
-    await this.axiesService.listLatest();
+    return await this.axiesService.listLatest();
   }
 
   @Get('/list-recently-sold')
   async listRecentlySold() {
-    await this.axiesService.listRecentlySold();
+    return await this.axiesService.listRecentlySold();
   }
 
   @Get('/list-axies')
   async listAxies() {
-    await this.axiesService.listAxies();
+    return await this.axiesService.listAxies();
   }
 }
