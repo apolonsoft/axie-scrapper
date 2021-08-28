@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { AxiesService } from '../services/axies.service';
 
 @Controller('axies')
@@ -18,5 +18,13 @@ export class AxiesController {
   @Get('/list-axies')
   async listAxies() {
     return await this.axiesService.listAxies();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    if (id) {
+      return await this.axiesService.findOne(id);
+    }
+    return '';
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -25,6 +25,12 @@ export class AxiesService {
     private axieModel: Model<AxieDocument>,
     private httpService: HttpService,
   ) {}
+
+  findOne(id: string): Promise<AxieDocument> {
+    return new Promise((resolve, reject) => {
+      this.getAxieDetail(id).then(resolve).catch(reject);
+    });
+  }
 
   async listLatest() {
     return await this.latestAxiesModel.find().exec();
@@ -167,8 +173,9 @@ export class AxiesService {
   }
 
   async getAxieDetail(axieId: string) {
-    try {
-      const query = `query GetAxieDetail($axieId: ID!) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const query = `query GetAxieDetail($axieId: ID!) {
   axie(axieId: $axieId) {
     id
     image
@@ -260,37 +267,40 @@ export class AxiesService {
 }
 `;
 
-      const result = await this.httpService
-        .post(
-          'https://axieinfinity.com/graphql-server-v2/graphql',
-          JSON.stringify({
-            query,
-            variables: { axieId },
-          }),
-          {
-            headers: {
-              'Content-Type': 'application/json',
+        const result = await this.httpService
+          .post(
+            'https://axieinfinity.com/graphql-server-v2/graphql',
+            JSON.stringify({
+              query,
+              variables: { axieId },
+            }),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
             },
-          },
-        )
-        .toPromise();
-      const { data } = result.data;
-      const { axie } = data;
-      const { genes, stats, parts, class: cls } = axie;
-      const axieGene = new AxieGene(genes);
-      const genQuantity = axieGene.getGeneQuality();
-      const allGenes = axieGene.genes;
-      const createdAxie = new this.axieModel({
-        class: cls,
-        stats,
-        parts,
-        allGenes,
-        genQuantity,
-      });
-      await createdAxie.save();
-    } catch (error) {
-      console.log(error);
-    }
+          )
+          .toPromise();
+        const { data } = result.data;
+        const { axie } = data;
+        const { genes, stats, parts, class: cls } = axie;
+        const axieGene = new AxieGene(genes);
+        const genQuantity = axieGene.getGeneQuality();
+        const allGenes = axieGene.genes;
+        const createdAxie = new this.axieModel({
+          class: cls,
+          stats,
+          parts,
+          allGenes,
+          genQuantity,
+        });
+        resolve(createdAxie);
+        // await createdAxie.save();
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+    });
   }
 
   async getRecentlyAxiesSold(from: number, size: number) {
